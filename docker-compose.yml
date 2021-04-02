@@ -1,0 +1,41 @@
+version: "3.5"
+services:
+  www:
+    build: .
+    ports:
+      - 127.0.0.1:8001:80
+    volumes:
+      - ./www:/var/www/html/
+    links:
+      - db
+    networks:
+      - default
+  db:
+    image: mysql:8.0
+    ports:
+      - 127.0.0.1:3306:3306
+    command: --default-authentication-plugin=mysql_native_password
+    environment:
+      MYSQL_DATABASE: myDb
+      MYSQL_USER: user
+      MYSQL_PASSWORD: test
+      MYSQL_ROOT_PASSWORD: test
+    volumes:
+      - ./db/mysql:/var/lib/mysql
+    networks:
+      - default
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    links:
+      - db:db
+    ports:
+      - 127.0.0.1:8000:80
+    volumes:
+      - ./htaccess:/var/www/html/.htaccess
+      - ./htpasswd:/etc/phpmyadmin/.htpasswd
+    environment:
+      MYSQL_USER: user
+      MYSQL_PASSWORD: test
+      MYSQL_ROOT_PASSWORD: test
+volumes:
+  persistent:
